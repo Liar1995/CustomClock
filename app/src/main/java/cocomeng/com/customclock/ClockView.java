@@ -86,6 +86,39 @@ public class ClockView extends View {
 
     }
 
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        int width = 1000; //设定一个最小值
+
+        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        if (widthMode == MeasureSpec.AT_MOST || widthMode == MeasureSpec.UNSPECIFIED || heightMeasureSpec == MeasureSpec.AT_MOST || heightMeasureSpec == MeasureSpec.UNSPECIFIED) {
+            try {
+                throw new NoDetermineSizeException("宽度高度至少有一个确定的值,不能同时为wrap_content");
+            } catch (NoDetermineSizeException e) {
+                e.printStackTrace();
+            }
+        } else { //至少有一个为确定值,要获取其中的最小值
+            if (widthMode == MeasureSpec.EXACTLY) {
+                width = Math.min(widthSize, width);
+            }
+            if (heightMode == MeasureSpec.EXACTLY) {
+                width = Math.min(heightSize, width);
+            }
+        }
+        setMeasuredDimension(width, width);
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+        mRadius = (Math.min(w, h) - mPadding) / 2;
+        mPointEndLength = mRadius / 6; //尾部指针默认为半径的六分之一
+    }
+
     //Dp转px
     private float DptoPx(int value) {
 
